@@ -11,7 +11,7 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url('^hello/$', hello),
-    url("^407/$", page_404),
+    url("^408/$", page_404),
     url('^time/$', current_datetime),
     url(r'^time/plus/(\d{1,2})/$', hours_ahead),
 )
