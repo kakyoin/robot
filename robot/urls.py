@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-from views import hello, page_404, current_datetime, hours_ahead
+from views import hello, page_404, current_datetime, hours_ahead, display_meta
 
 
 urlpatterns = patterns('',
@@ -14,4 +14,5 @@ urlpatterns = patterns('',
     url("^408/$", page_404),
     url('^time/$', current_datetime),
     url(r'^time/plus/(\d{1,2})/$', hours_ahead),
+    url(r'^meta/$', display_meta),
 )
