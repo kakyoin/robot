@@ -40,3 +40,7 @@ def display_meta(request):
     for k, v in values:
         html.append('<tr><td>%s</td><td>%s</td></tr>' % (k, v))
     return HttpResponse('<table>%s</table>' % '\n'.join(html))
+
+
+def search_form(request):
+    return render_to_response('search_form.html')
