@@ -1,8 +1,9 @@
 import datetime
 
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 
+from books.models import Book
 
 def hello(request):
     return HttpResponse("Hello world")
@@ -42,5 +43,29 @@ def display_meta(request):
     return HttpResponse('<table>%s</table>' % '\n'.join(html))
 
 
+# def search_form(request):
+# return render_to_response('search_form.html')
+#
+#
+# def search(request):
+#     if 'q' in request.GET:
+#         message = 'You searched for: %r' % request.GET['q']
+#     else:
+#         message = 'You submitted an empty form.'
+#     return HttpResponse(message)
+
 def search_form(request):
-    return render_to_response('search_form.html')
+    return render(request, 'search_form.html')
+
+
+def search(request):
+    error = False
+    if 'q' in request.GET:
+        q = request.GET['q']
+        if not q:
+            error = True
+        else:
+            books = Book.objects.filter(title__icontains=q)
+            return render(request, 'search_results.html',
+                          {'books': books, 'query': q})
+    return render(request, 'search_form.html', {'error': error})
