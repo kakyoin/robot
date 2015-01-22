@@ -1,9 +1,12 @@
 import datetime
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, render
+from django.core.mail import send_mail
+from django.template import RequestContext
 
 from books.models import Book
+
 
 def hello(request):
     return HttpResponse("Hello world")
@@ -14,9 +17,9 @@ def page_404(request):
 
 
 # def current_datetime(request):
-#     now = datetime.datetime.now()
-#     html = "<html><body>It is now %s.</body></html>" % now
-#     return HttpResponse(html)
+# now = datetime.datetime.now()
+# html = "<html><body>It is now %s.</body></html>" % now
+# return HttpResponse(html)
 
 
 def current_datetime(request):
@@ -59,13 +62,56 @@ def search_form(request):
 
 
 def search(request):
-    error = False
+    errors = []
     if 'q' in request.GET:
         q = request.GET['q']
         if not q:
-            error = True
+            errors.append('Enter a search term.')
+        elif len(q) > 20:
+            errors.append('Please enter at most 20 characters.')
         else:
             books = Book.objects.filter(title__icontains=q)
-            return render(request, 'search_results.html',
-                          {'books': books, 'query': q})
-    return render(request, 'search_form.html', {'error': error})
+            return render(request, 'search_results.html', {'books': books, 'query': q})
+    return render(request, 'search_form.html', {'errors': errors})
+
+
+def contact(request):
+    errors = []
+    if request.method == 'POST':
+        if not request.POST.get('subject', ''):
+            errors.append('Enter a subject.')
+        if not request.POST.get('message', ''):
+            errors.append('Enter a message.')
+        if request.POST.get('email') and '@' not in request.POST['email']:
+            errors.append('Enter a valid e-mail address.')
+        if not errors:
+            send_mail(
+                request.POST['subject'],
+                request.POST['message'],
+                request.POST.get('email', 'noreply@example.com'),
+                ['siteowner@example.com'],
+            )
+            return HttpResponseRedirect('/contact/thanks/')
+    return render_to_response('contact_form.html', {'errors': errors, 'subject': request.POST.get('subject', ''),
+                                                    'message': request.POST.get('message', ''),
+                                                    'email': request.POST.get('email', ''), },
+                              context_instance=RequestContext(request))
+
+
+    # def get_name(request):
+    # # if this is a POST request we need to process the form data
+    #     if request.method == 'POST':
+    #         # create a form instance and populate it with data from the request:
+    #         form = NameForm(request.POST)
+    #         # check whether it's valid:
+    #         if form.is_valid():
+    #             # process the data in form.cleaned_data as required
+    #             # ...
+    #             # redirect to a new URL:
+    #             return HttpResponseRedirect('/thanks/')
+    #
+    #     # if a GET (or any other method) we'll create a blank form
+    #     else:
+    #         form = NameForm()
+    #
+    #     return render(request, 'name.html', {'form': form})
