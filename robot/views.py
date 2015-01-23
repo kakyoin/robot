@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response, render
 from django.core.mail import send_mail
 from django.template import RequestContext
 
-from books.forms import ContactForm
+from books.forms import ContactForm, NameForm
 from books.models import Book
 
 
@@ -131,5 +131,26 @@ def contact(request):
             )
             return HttpResponseRedirect('/contact/thanks/')
     else:
-        form = ContactForm()
+        form = ContactForm(
+            initial={'subject': 'I love your site!'}
+        )
     return render_to_response('contact_form.html', {'form': form}, context_instance=RequestContext(request))
+
+
+def get_name(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = NameForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            return HttpResponseRedirect('/thanks/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = NameForm()
+
+    return render(request, 'name.html', {'form': form})

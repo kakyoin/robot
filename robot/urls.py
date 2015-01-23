@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-from views import hello, page_404, current_datetime, hours_ahead, display_meta, search_form, search, contact
+from views import hello, page_404, current_datetime, hours_ahead, display_meta, search_form, search, contact, get_name
 
 
 urlpatterns = patterns('',
@@ -18,4 +18,5 @@ urlpatterns = patterns('',
     url(r'^search-form/$', search_form),
     url(r'^search/$', search),
     url(r'^contact/$', contact),
+    url(r'^name/$', get_name),
 )
